@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">ThirdTask</string>
+    <string name="edit_name_practice">Edit name</string>>
+    <string name="edit_description_practice">Edit description</string>>
+    <string name="good_practice">Good</string>
+    <string name="bad_practice">Bad</string>
+    <string name="apply_button">apply</string>
+    <string name="placeholder_cr">Count %1$d Repeat %2$d times in a day.</string>
+    <string name="type_text">Type: %1$s</string>>
+    <string name="level_text">Level: %1$s</string>>
+</resources>
