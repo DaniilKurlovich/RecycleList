@@ -11,22 +11,22 @@ enum class TypePractice(val kind: String) {
 
 
 data class Practice(
-    val uniq_id: String? = UUID.randomUUID().toString(),
     var name: String? = "",
     var description: String? = "",
     var priority: String? = "",
     var typePractice: String? = TypePractice.GOOD.kind,
     var period: Int = 1,
-    var count: Int = 1
-): Parcelable {
+    var count: Int = 1,
+    val uniq_id: String? = UUID.randomUUID().toString()
+    ): Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString(),
         parcel.readString(),
         parcel.readString(),
         parcel.readString(),
-        parcel.readString(),
         parcel.readInt(),
-        parcel.readInt()
+        parcel.readInt(),
+        parcel.readString()
     )
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(name)

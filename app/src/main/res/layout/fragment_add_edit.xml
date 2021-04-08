@@ -2,21 +2,27 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/addEditFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AddEditActivity">
+    android:layout_weight="1"
+    android:orientation="vertical"
+    tools:context=".AddEditFragment">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/editNamePractice"
-            android:layout_width="match_parent"
+            android:layout_width="185dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="32dp"
+            android:layout_marginStart="22dp"
+            android:layout_marginLeft="22dp"
             android:layout_marginTop="64dp"
             android:layout_marginEnd="32dp"
+            android:layout_marginRight="25dp"
             android:hint="@string/edit_name_practice"
             app:hintTextAppearance="@style/TextAppearance.AppCompat.Medium"
             app:layout_constraintStart_toStartOf="parent"
@@ -25,13 +31,13 @@
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/edit_text"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:inputType="text" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/editDescriptionPractice"
-            android:layout_width="match_parent"
+            android:layout_width="185dp"
             android:layout_height="110dp"
             android:layout_marginStart="32dp"
             android:layout_marginTop="32dp"
@@ -74,14 +80,12 @@
                 android:id="@+id/good_habit"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:onClick="setTypePractice"
                 android:text="@string/good_practice" />
 
             <RadioButton
                 android:id="@+id/bad_habit"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
-                android:onClick="setTypePractice"
                 android:text="@string/bad_practice" />
         </RadioGroup>
 
@@ -117,18 +121,30 @@
                 android:inputType="number" />
         </com.google.android.material.textfield.TextInputLayout>
 
-
-        <Button
-            android:id="@+id/applyButton"
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnPositive"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="52dp"
-            android:onClick="applyPractice"
-            android:text="@string/apply_button"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/period_practice"/>
+            android:layout_marginStart="176dp"
+            android:layout_marginLeft="176dp"
+            android:layout_marginTop="20sp"
+            android:text="@string/label_ok"
+            app:layout_constraintStart_toStartOf="@+id/period_practice"
+            app:layout_constraintTop_toBottomOf="@+id/period_practice" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnNegative"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="60dp"
+            android:layout_marginTop="20sp"
+            android:layout_marginRight="60dp"
+            android:text="@string/label_cancel"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/btnPositive"
+            app:layout_constraintTop_toBottomOf="@+id/period_practice" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </ScrollView>
