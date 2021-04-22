@@ -7,9 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
-import androidx.lifecycle.Lifecycle
 import androidx.viewpager.widget.ViewPager
-import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.google.android.material.tabs.TabLayout
 import java.lang.Exception
 
@@ -23,7 +21,7 @@ class TabFragment: Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.list_activity, container, false)
+        return inflater.inflate(R.layout.home_activity, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -39,10 +37,11 @@ class TabFragment: Fragment() {
 
 
 class CollectionTabAdapter(fm: FragmentManager): FragmentStatePagerAdapter(fm) {
-    override fun getCount(): Int = 2
 
-    val fragmentBadList = ListPracticeFragment.newInstance("Good")
-    val fragmentGoodList = ListPracticeFragment.newInstance("Bad")
+    val fragmentBadList = PracticesList.newInstance("Good")
+    val fragmentGoodList = PracticesList.newInstance("Bad")
+
+    override fun getCount(): Int = 2
 
     override fun getItem(position: Int): Fragment {
         when (position) {

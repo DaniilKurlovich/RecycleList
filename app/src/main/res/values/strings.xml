@@ -12,4 +12,10 @@
     <string name="label_cancel">Cancel</string>
     <string name="tab_text_1">Tab 1</string>
     <string name="tab_text_2">Tab 2</string>
+    <string name="action_share">Share</string>
+    <string name="action_upload">Upload</string>
+    <string name="action_copy">Copy</string>
+    <string name="action_print">Print</string>
+    <string name="choose_filter">Choose_filter</string>
+    <string name="find_by_name">Find practice by name:</string>
 </resources>

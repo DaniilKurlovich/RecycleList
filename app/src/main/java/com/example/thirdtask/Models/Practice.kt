@@ -1,23 +1,17 @@
-package com.example.thirdtask
+package com.example.thirdtask.Models
 
 import android.os.Parcel
 import android.os.Parcelable
-import java.util.*
-
-enum class TypePractice(val kind: String) {
-    GOOD("good"),
-    BAD("bad")
-}
 
 
 data class Practice(
-    var name: String? = "",
-    var description: String? = "",
-    var priority: String? = "",
-    var typePractice: String? = TypePractice.GOOD.kind,
-    var period: Int = 1,
-    var count: Int = 1,
-    val uniq_id: String? = UUID.randomUUID().toString()
+    var name: String?,
+    var description: String?,
+    var priority: String?,
+    var typePractice: String?,
+    var period: Int,
+    var count: Int,
+    val uniq_id: String?
     ): Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString(),

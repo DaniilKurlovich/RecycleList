@@ -8,7 +8,7 @@
     android:layout_margin="25dp"
     android:id="@+id/card_view"
     android:layout_gravity="center"
-    tools:context = ".ListActivity"
+    tools:context = ".HomeActivity"
     app:cardBackgroundColor="?attr/colorPrimaryDark">
 
 

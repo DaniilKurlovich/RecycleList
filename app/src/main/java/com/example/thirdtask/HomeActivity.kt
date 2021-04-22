@@ -6,6 +6,7 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
+import com.example.thirdtask.Models.Practice
 import com.google.android.material.navigation.NavigationView
 
 interface PracticeClickListener {
@@ -13,7 +14,7 @@ interface PracticeClickListener {
 }
 
 
-class ListActivity : AppCompatActivity() {
+class HomeActivity : AppCompatActivity() {
     private var mDrawer: DrawerLayout? = null
     private var nvDrawer: NavigationView? = null
     private var toolbar: Toolbar? = null
@@ -22,11 +23,10 @@ class ListActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.list_activity)
+        setContentView(R.layout.home_activity)
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
         mDrawer = findViewById(R.id.drawer_layout)
-
         nvDrawer = findViewById(R.id.nvView)
         setUpDrawerContent(nvDrawer!!)
 
@@ -58,12 +58,10 @@ class ListActivity : AppCompatActivity() {
         }
     }
 
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             android.R.id.home -> mDrawer?.openDrawer(GravityCompat.START);
         }
         return super.onOptionsItemSelected(item)
     }
-
 }
