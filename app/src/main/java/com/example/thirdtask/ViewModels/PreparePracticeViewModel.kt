@@ -2,11 +2,13 @@ package com.example.thirdtask.ViewModels
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import com.example.thirdtask.Crud.PracticeDao
+import com.example.thirdtask.Crud.PracticeEntity
 import com.example.thirdtask.Models.Practice
 import java.util.*
 
-class PreparePractice : ViewModel() {
-    val practiceReady: MutableLiveData<Practice> = MutableLiveData()
+class PreparePracticeViewModel(val practiceDao: PracticeDao) : ViewModel() {
+    val practiceReady: MutableLiveData<Boolean> = MutableLiveData()
 
     private var statusReady: Boolean = false
     private var uniqId: String = UUID.randomUUID().toString()
@@ -54,7 +56,8 @@ class PreparePractice : ViewModel() {
         this.statusReady =
             (this.period != -1) and (this.count != -1) and (this.name != "") and (this.description != "") and (this.type != "") and (this.level != "")
         if (this.statusReady){
-            practiceReady.postValue(Practice(this.name, this.description, this.level, this.type, this.count, this.period, uniqId))
+            practiceDao.insert(PracticeEntity(Practice(this.name, this.description, this.level, this.type, this.count, this.period, uniqId)))
+            practiceReady.postValue(true)
         }
     }
 

@@ -1,5 +1,7 @@
 package com.example.thirdtask.Models
 
+import androidx.room.Room
+
 class PracticeStorageModel private constructor() {
 
     companion object {

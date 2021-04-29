@@ -11,14 +11,14 @@ import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.Spinner
 import androidx.lifecycle.ViewModelProvider
-import com.example.thirdtask.Models.PracticeStorageModel
+import com.example.thirdtask.Crud.PracticeDatabase
 import com.example.thirdtask.ViewModels.PracticesListViewModel
 import com.example.thirdtask.ViewModels.ViewModelFactory
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlinx.android.synthetic.main.fragment_add_edit.*
 
 
-class BottomSheet : BottomSheetDialogFragment() {
+class BottomSheetFragment : BottomSheetDialogFragment() {
     private lateinit var spinner: Spinner
     private lateinit var practicesListViewModel: PracticesListViewModel
     private lateinit var findPracticeInput: EditText
@@ -54,7 +54,8 @@ class BottomSheet : BottomSheetDialogFragment() {
         priority_practice.adapter = spinnerAdapter
         priority_practice.onItemSelectedListener = SpinnerContext()
 
-        practicesListViewModel = ViewModelProvider(this, ViewModelFactory(PracticeStorageModel()!!)).get(PracticesListViewModel::class.java)
+        val db = PracticeDatabase.getInstance(requireContext())
+        practicesListViewModel = ViewModelProvider(this, ViewModelFactory(db!!.practiceDao())).get(PracticesListViewModel::class.java)
         practicesListViewModel.findPracticeByName("")   // hack! чтобы скидывать поиск
 
         findPracticeInput = requireView().findViewById(R.id.find_text_name)
@@ -73,8 +74,8 @@ class BottomSheet : BottomSheetDialogFragment() {
 
     companion object {
         const val TAG = "ActionBottomDialog"
-        fun newInstance(): BottomSheet {
-            return BottomSheet()
+        fun newInstance(): BottomSheetFragment {
+            return BottomSheetFragment()
         }
     }
 }

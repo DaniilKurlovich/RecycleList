@@ -8,23 +8,21 @@ import android.widget.*
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.example.thirdtask.Crud.PracticeDatabase
 import com.example.thirdtask.Models.Practice
-import com.example.thirdtask.Models.PracticeStorageModel
-import com.example.thirdtask.ViewModels.PracticesListViewModel
-import com.example.thirdtask.ViewModels.PreparePractice
-import com.example.thirdtask.ViewModels.ViewModelFactory
+import com.example.thirdtask.ViewModels.PreparePracticeViewModel
 import com.google.android.material.textfield.TextInputLayout
 import kotlinx.android.synthetic.main.fragment_add_edit.*
 import kotlinx.android.synthetic.main.fragment_add_edit.view.*
 
-class AddEditPractice : DialogFragment() {
+class AddEditPracticeFragment : DialogFragment() {
     companion object {
         const val PRACTICE_KEY_PUBSUB = "practice"
         val PRACTICE_LEVELS = listOf("LOW", "MEDIUM", "HIGH", "ULTRA")
 
         @JvmStatic
         fun newInstance(practice: Practice?) =
-            AddEditPractice().apply {
+            AddEditPracticeFragment().apply {
                 arguments = Bundle().apply {
                     putParcelable(PRACTICE_KEY_PUBSUB, practice)
                 }
@@ -32,8 +30,7 @@ class AddEditPractice : DialogFragment() {
     }
 
     // ViewModels
-    private lateinit var preparePracticeVM: PreparePractice
-    private lateinit var listPracticesListViewModel: PracticesListViewModel
+    private lateinit var preparePracticeVM: PreparePracticeViewModel
 
     // UI
     private lateinit var namePracticeView: TextInputLayout
@@ -58,16 +55,15 @@ class AddEditPractice : DialogFragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val db = PracticeDatabase.getInstance(requireContext())
+
         preparePracticeVM = ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-                return PreparePractice() as T
+                return PreparePracticeViewModel(db!!.practiceDao()) as T
             }
-        }).get(PreparePractice::class.java)
-
-        listPracticesListViewModel = ViewModelProvider(this, ViewModelFactory(PracticeStorageModel()!!)).get(PracticesListViewModel::class.java)
+        }).get(PreparePracticeViewModel::class.java)
 
         preparePracticeVM.practiceReady.observe(requireActivity(), {
-            listPracticesListViewModel.addPractice(it)
             dismiss()
         })
     }

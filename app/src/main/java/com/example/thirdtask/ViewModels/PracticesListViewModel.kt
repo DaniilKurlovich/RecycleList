@@ -3,12 +3,13 @@ package com.example.thirdtask.ViewModels
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import com.example.thirdtask.Crud.PracticeDao
+import com.example.thirdtask.Crud.PracticeEntity
 import com.example.thirdtask.Models.Practice
-import com.example.thirdtask.Models.PracticeStorageModel
 import java.lang.Exception
 
 
-class ViewModelFactory(private val model: PracticeStorageModel) : ViewModelProvider.Factory {
+class ViewModelFactory(private val practiceDao: PracticeDao) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(PracticesListViewModel::class.java)) {
@@ -16,7 +17,7 @@ class ViewModelFactory(private val model: PracticeStorageModel) : ViewModelProvi
             if (hashMapViewModel.containsKey(key)) {
                 return getViewModel(key) as T
             } else {
-                addViewModel(key, PracticesListViewModel(model))
+                addViewModel(key, PracticesListViewModel(practiceDao))
                 return getViewModel(key) as T
             }
         }
@@ -35,39 +36,57 @@ class ViewModelFactory(private val model: PracticeStorageModel) : ViewModelProvi
     }
 }
 
-class PracticesListViewModel(private val model: PracticeStorageModel) : ViewModel() {
+class PracticesListViewModel(private val practiceDao: PracticeDao) : ViewModel() {
     companion object {
-        val filters = mutableListOf("No filter", "Alphabetical name")
+        const val NO_FILTER =  "No filter"
+        const val ALPHBTCL_FILTER = "Alphabetical name"
+
+        val filters = mutableListOf(NO_FILTER, ALPHBTCL_FILTER)
     }
 
     val practiceList: MutableLiveData<ArrayList<Practice>> = MutableLiveData()
 
     fun setFilter(name: String) {
         when (name) {
-            "No filter" -> return
-            "Alphabetical name" -> practiceList.postValue(getSortedNameListByName())
+            NO_FILTER-> return
+            ALPHBTCL_FILTER-> getSortedNameListByName()
             else -> throw Exception("Filter with name $name does not implemented.")
         }
     }
 
-    fun getSortedNameListByName(): ArrayList<Practice> {
-        val practices = model.getPractices()
-        practices.sortBy { it.name }
-        return practices
+    fun getSortedNameListByName() {
+        practiceDao.getAll().observeForever {
+            val practices = castToArrayList(it)
+            practices.sortBy { practice ->  practice.name }
+            practiceList.postValue(practices)
+        }
+    }
+
+    fun postPractices(){
+        practiceDao.getAll().observeForever {
+            val practices = mutableListOf<Practice>() as ArrayList<Practice>
+            it.map { practiceEntity -> practices.add(practiceEntity.practice) }
+            practiceList.postValue(practices)
+        }
     }
 
     fun findPracticeByName(name: String) {
         if (name == "") {
-            practiceList.postValue(model.getPractices())
+            practiceDao.getAll().observeForever { practiceList.postValue(castToArrayList(it)) }
             return
         }
 
-        practiceList.postValue(
-            model.getPractices()
-                .filter { practice -> practice.name!!.startsWith(name) } as ArrayList<Practice>)
+        practiceDao.getPracticeByName(name).observeForever { practiceList.postValue(castToArrayList(it)) }
     }
 
     fun addPractice(practice: Practice) {
-        practiceList.postValue(model.addEditPractice(practice))
+        practiceDao.insert(practice as PracticeEntity)
+        practiceDao.getAll().observeForever{ practiceList.postValue(castToArrayList(it)) }
+    }
+
+    fun castToArrayList(listPractices: List<PracticeEntity>?): ArrayList<Practice> {
+        val practices = mutableListOf<Practice>() as ArrayList<Practice>
+        listPractices?.map { practiceEntity -> practices.add(practiceEntity.practice) }
+        return practices
     }
 }

@@ -8,14 +8,14 @@ import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.thirdtask.Crud.PracticeDatabase
 import com.example.thirdtask.Models.Practice
-import com.example.thirdtask.Models.PracticeStorageModel
 import com.example.thirdtask.ViewModels.PracticesListViewModel
 import com.example.thirdtask.ViewModels.ViewModelFactory
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlin.collections.ArrayList
 
-class PracticesList : Fragment(), PracticeClickListener {
+class PracticesListFragment: Fragment(), PracticeClickListener {
     private lateinit var recyclerView: RecyclerView
     private lateinit var practicesListViewModel: PracticesListViewModel
     private lateinit var listAdapter: PracticeAdapter
@@ -23,7 +23,9 @@ class PracticesList : Fragment(), PracticeClickListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        practicesListViewModel = ViewModelProvider(this, ViewModelFactory(PracticeStorageModel()!!)).get(PracticesListViewModel::class.java)
+        val db = PracticeDatabase.getInstance(requireContext())
+        practicesListViewModel = ViewModelProvider(this, ViewModelFactory(db!!.practiceDao())).get(PracticesListViewModel::class.java)
+        practicesListViewModel.postPractices()
         childFragmentManager.setFragmentResultListener("response", this){ _, bundle ->
             observeResultFromDialog(bundle)
         }
@@ -68,18 +70,18 @@ class PracticesList : Fragment(), PracticeClickListener {
     }
 
     override fun onPracticeListener(data: Practice) {
-        val dialog = AddEditPractice.newInstance(data)
+        val dialog = AddEditPracticeFragment.newInstance(data)
         dialog.show(childFragmentManager, "dialog")
     }
 
     fun onClick(v: View?) {
-        val dialog = AddEditPractice()
+        val dialog = AddEditPracticeFragment()
         dialog.show(childFragmentManager, "dialog")
     }
 
     fun showFiltersFragment(v: View?) {
-        val dialog = BottomSheet.newInstance()
-        dialog.show(childFragmentManager, BottomSheet.TAG)
+        val dialog = BottomSheetFragment.newInstance()
+        dialog.show(childFragmentManager, BottomSheetFragment.TAG)
     }
 
     companion object {
@@ -87,7 +89,7 @@ class PracticesList : Fragment(), PracticeClickListener {
 
         @JvmStatic
         fun newInstance(typePractice: String) =
-            PracticesList().apply {
+            PracticesListFragment().apply {
                 arguments = Bundle().apply {
                     putString(keyTypePractice, typePractice)
                 }

@@ -38,8 +38,8 @@ class TabFragment: Fragment() {
 
 class CollectionTabAdapter(fm: FragmentManager): FragmentStatePagerAdapter(fm) {
 
-    val fragmentBadList = PracticesList.newInstance("Good")
-    val fragmentGoodList = PracticesList.newInstance("Bad")
+    val fragmentBadList = PracticesListFragment.newInstance("Good")
+    val fragmentGoodList = PracticesListFragment.newInstance("Bad")
 
     override fun getCount(): Int = 2
 
