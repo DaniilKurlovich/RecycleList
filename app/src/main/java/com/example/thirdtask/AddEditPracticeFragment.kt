@@ -14,6 +14,8 @@ import com.example.thirdtask.ViewModels.PreparePracticeViewModel
 import com.google.android.material.textfield.TextInputLayout
 import kotlinx.android.synthetic.main.fragment_add_edit.*
 import kotlinx.android.synthetic.main.fragment_add_edit.view.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class AddEditPracticeFragment : DialogFragment() {
     companion object {
@@ -88,7 +90,7 @@ class AddEditPracticeFragment : DialogFragment() {
                 "GOOD" -> requireView().findViewById<RadioButton>(R.id.good_habit).isChecked = true
                 "BAD" -> requireView().findViewById<RadioButton>(R.id.bad_habit).isChecked = true
             }
-            practice.uniq_id?.let { it1 -> preparePracticeVM.setUniqId(it1) }
+            practice.uniqId?.let { it1 -> preparePracticeVM.setUniqId(it1) }
         } ?: run {
             countPracticeView.editText?.setText("0")
             periodPracticeView.editText?.setText("0")
@@ -128,6 +130,8 @@ class AddEditPracticeFragment : DialogFragment() {
         preparePracticeVM.setCount(countPracticeView.editText?.text.toString().toIntOrNull())
         preparePracticeVM.setPeriod(periodPracticeView.editText?.text.toString().toIntOrNull())
         preparePracticeVM.setType(requireView().findViewById<RadioButton>(radioPracticeType.checkedRadioButtonId).text as String)
-        preparePracticeVM.applyPractice()
+        GlobalScope.launch {
+            preparePracticeVM.applyPractice()
+        }
     }
 }

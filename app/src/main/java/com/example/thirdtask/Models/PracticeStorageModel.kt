@@ -1,7 +1,5 @@
 package com.example.thirdtask.Models
 
-import androidx.room.Room
-
 class PracticeStorageModel private constructor() {
 
     companion object {
@@ -16,7 +14,7 @@ class PracticeStorageModel private constructor() {
     private val practices: ArrayList<Practice> = ArrayList()
 
     fun addEditPractice(practice: Practice): ArrayList<Practice> {
-        val index: Int? = practices.indices.firstOrNull{ it -> practices[it].uniq_id == practice.uniq_id}
+        val index: Int? = practices.indices.firstOrNull{ it -> practices[it].uniqId == practice.uniqId}
         if (index != null) {
             practices[index] = practice
         } else {

@@ -15,11 +15,13 @@ abstract class PracticeDatabase : RoomDatabase() {
         fun getInstance(context: Context): PracticeDatabase? {
             if (INSTANCE == null) {
                 synchronized(PracticeDatabase::class) {
-                    INSTANCE = Room.databaseBuilder(
-                        context.applicationContext,
-                        PracticeDatabase::class.java,
-                        "practice_database"
-                    ).allowMainThreadQueries().build()
+                    if (INSTANCE == null) {
+                        INSTANCE = Room.databaseBuilder(
+                            context.applicationContext,
+                            PracticeDatabase::class.java,
+                            "practice_database"
+                        ).build()
+                    }
                 }
             }
             return INSTANCE

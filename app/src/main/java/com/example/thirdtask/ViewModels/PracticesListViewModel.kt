@@ -1,12 +1,15 @@
 package com.example.thirdtask.ViewModels
 
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.*
 import com.example.thirdtask.Crud.PracticeDao
 import com.example.thirdtask.Crud.PracticeEntity
 import com.example.thirdtask.Models.Practice
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancelChildren
 import java.lang.Exception
+import kotlin.coroutines.CoroutineContext
 
 
 class ViewModelFactory(private val practiceDao: PracticeDao) : ViewModelProvider.Factory {
@@ -39,54 +42,70 @@ class ViewModelFactory(private val practiceDao: PracticeDao) : ViewModelProvider
 class PracticesListViewModel(private val practiceDao: PracticeDao) : ViewModel() {
     companion object {
         const val NO_FILTER =  "No filter"
-        const val ALPHBTCL_FILTER = "Alphabetical name"
+        const val ALPHABET_FILTER = "Alphabetical name"
 
-        val filters = mutableListOf(NO_FILTER, ALPHBTCL_FILTER)
+        val filters = mutableListOf(NO_FILTER, ALPHABET_FILTER)
     }
 
     val practiceList: MutableLiveData<ArrayList<Practice>> = MutableLiveData()
+    val observer: Observer<List<PracticeEntity>> = Observer { newPractices(it) }
+
+    init {
+        practiceDao.getAll().observeForever(observer)
+    }
 
     fun setFilter(name: String) {
         when (name) {
             NO_FILTER-> return
-            ALPHBTCL_FILTER-> getSortedNameListByName()
+            ALPHABET_FILTER-> getSortedNameListByName()
             else -> throw Exception("Filter with name $name does not implemented.")
         }
     }
 
+    fun newPractices(it: List<PracticeEntity>) {
+        val practices = castToArrayList(it)
+        practices.sortBy { practice ->  practice.name }
+        practiceList.postValue(practices)
+
+    }
+
     fun getSortedNameListByName() {
-        practiceDao.getAll().observeForever {
+        practiceDao.getAll().observeOnce {
             val practices = castToArrayList(it)
             practices.sortBy { practice ->  practice.name }
             practiceList.postValue(practices)
         }
     }
 
-    fun postPractices(){
-        practiceDao.getAll().observeForever {
-            val practices = mutableListOf<Practice>() as ArrayList<Practice>
-            it.map { practiceEntity -> practices.add(practiceEntity.practice) }
-            practiceList.postValue(practices)
-        }
-    }
-
     fun findPracticeByName(name: String) {
         if (name == "") {
-            practiceDao.getAll().observeForever { practiceList.postValue(castToArrayList(it)) }
+            practiceDao.getAll().observeOnce { practiceList.postValue(castToArrayList(it)) }
             return
         }
 
-        practiceDao.getPracticeByName(name).observeForever { practiceList.postValue(castToArrayList(it)) }
-    }
+        practiceDao.getPracticeByName(name).observeOnce { practiceList.postValue(castToArrayList(it)) }
 
-    fun addPractice(practice: Practice) {
-        practiceDao.insert(practice as PracticeEntity)
-        practiceDao.getAll().observeForever{ practiceList.postValue(castToArrayList(it)) }
     }
 
     fun castToArrayList(listPractices: List<PracticeEntity>?): ArrayList<Practice> {
         val practices = mutableListOf<Practice>() as ArrayList<Practice>
         listPractices?.map { practiceEntity -> practices.add(practiceEntity.practice) }
         return practices
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        practiceDao.getAll().removeObserver { observer }
+    }
+
+    fun <T> LiveData<T>.observeOnce(observer: Observer<T>) {
+        observeForever(object : Observer<T> {
+
+            override fun onChanged(t: T?) {
+                observer.onChanged(t)
+                removeObserver(this)
+            }
+
+        })
     }
 }

@@ -25,15 +25,7 @@ class PracticesListFragment: Fragment(), PracticeClickListener {
         super.onCreate(savedInstanceState)
         val db = PracticeDatabase.getInstance(requireContext())
         practicesListViewModel = ViewModelProvider(this, ViewModelFactory(db!!.practiceDao())).get(PracticesListViewModel::class.java)
-        practicesListViewModel.postPractices()
-        childFragmentManager.setFragmentResultListener("response", this){ _, bundle ->
-            observeResultFromDialog(bundle)
-        }
         typePractice = arguments?.getString(keyTypePractice)!!
-    }
-
-    private fun observeResultFromDialog(bundle: Bundle) {
-        practicesListViewModel.addPractice(bundle.get("pair") as Practice)
     }
 
     override fun onCreateView(

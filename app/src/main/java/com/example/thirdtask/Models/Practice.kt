@@ -11,7 +11,7 @@ data class Practice(
     var typePractice: String?,
     var period: Int,
     var count: Int,
-    val uniq_id: String?
+    var uniqId: String?
     ): Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readString(),
