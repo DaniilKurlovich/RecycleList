@@ -4,15 +4,18 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
+import com.example.thirdtask.AddEditPracticeFragment.Companion.PRACTICE_LEVELS
+import com.example.thirdtask.AddEditPracticeFragment.Companion.TYPE_PRACTICE
 import com.example.thirdtask.Crud.PracticeDao
 import com.example.thirdtask.Crud.PracticeEntity
-import com.example.thirdtask.Models.Practice
+import com.example.thirdtask.Network.Habit
+import com.example.thirdtask.Repositories.HabitRepository
 import kotlinx.coroutines.*
 import java.util.*
 import kotlin.coroutines.CoroutineContext
 
 
-class PreparePracticeViewModel(val practiceDao: PracticeDao) : ViewModel(), CoroutineScope {
+class PreparePracticeViewModel(val repo: HabitRepository) : ViewModel(), CoroutineScope {
 
     private val job: Job = SupervisorJob()
 
@@ -68,30 +71,23 @@ class PreparePracticeViewModel(val practiceDao: PracticeDao) : ViewModel(), Coro
             (this.period != -1) and (this.count != -1) and (this.name != "") and (this.description != "") and (this.type != "") and (this.level != "")
         if (this.statusReady) {
 
-            val practice = Practice(
+            val practice = Habit(
                 this.name,
                 this.description,
-                this.level,
-                this.type,
+                PRACTICE_LEVELS.indexOf(this.level),
+                TYPE_PRACTICE.indexOf(this.type),
                 this.count,
                 this.period,
                 uniqId
             )
 
             launch {
-                if (practice.uniqId == null) {
-                    practice.uniqId = UUID.randomUUID().toString()
-                    practiceDao.insert(PracticeEntity(practice))
+                if (practice.uid == null) {
+                    repo.insert(practice)
+//                    practiceDao.insert(PracticeEntity(practice))
                 } else {
-                    practiceDao.update(
-                        practice.name!!,
-                        practice.description!!,
-                        practice.priority!!,
-                        practice.typePractice!!,
-                        practice.count,
-                        practice.period,
-                        practice.uniqId!!
-                    )
+                    repo.update(practice)
+//                    repo.update(
                 }
             }
 

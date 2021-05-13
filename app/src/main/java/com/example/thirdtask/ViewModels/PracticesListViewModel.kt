@@ -3,16 +3,14 @@ package com.example.thirdtask.ViewModels
 import androidx.lifecycle.*
 import com.example.thirdtask.Crud.PracticeDao
 import com.example.thirdtask.Crud.PracticeEntity
-import com.example.thirdtask.Models.Practice
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancelChildren
+import com.example.thirdtask.Network.Habit
+import com.example.thirdtask.Repositories.HabitRepository
+import kotlinx.coroutines.*
 import java.lang.Exception
 import kotlin.coroutines.CoroutineContext
 
 
-class ViewModelFactory(private val practiceDao: PracticeDao) : ViewModelProvider.Factory {
+class ViewModelFactory(private val repo: HabitRepository?) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(PracticesListViewModel::class.java)) {
@@ -20,7 +18,7 @@ class ViewModelFactory(private val practiceDao: PracticeDao) : ViewModelProvider
             if (hashMapViewModel.containsKey(key)) {
                 return getViewModel(key) as T
             } else {
-                addViewModel(key, PracticesListViewModel(practiceDao))
+                addViewModel(key, PracticesListViewModel(repo!!))
                 return getViewModel(key) as T
             }
         }
@@ -39,7 +37,7 @@ class ViewModelFactory(private val practiceDao: PracticeDao) : ViewModelProvider
     }
 }
 
-class PracticesListViewModel(private val practiceDao: PracticeDao) : ViewModel() {
+class PracticesListViewModel(private val repo: HabitRepository) : ViewModel(), CoroutineScope {
     companion object {
         const val NO_FILTER =  "No filter"
         const val ALPHABET_FILTER = "Alphabetical name"
@@ -47,11 +45,17 @@ class PracticesListViewModel(private val practiceDao: PracticeDao) : ViewModel()
         val filters = mutableListOf(NO_FILTER, ALPHABET_FILTER)
     }
 
-    val practiceList: MutableLiveData<ArrayList<Practice>> = MutableLiveData()
-    val observer: Observer<List<PracticeEntity>> = Observer { newPractices(it) }
+    private val job: Job = SupervisorJob()
+
+    override val coroutineContext: CoroutineContext
+        get() = Dispatchers.IO + job + CoroutineExceptionHandler { _, e -> throw e }
+
+    val practiceList: MutableLiveData<List<Habit>> = MutableLiveData()
+    val observer: Observer<List<Habit>> = Observer { practiceList.postValue(it) }
 
     init {
-        practiceDao.getAll().observeForever(observer)
+        repo.practicesStorage.observeForever(observer)
+        launch {  repo.initPractices() }
     }
 
     fun setFilter(name: String) {
@@ -62,40 +66,33 @@ class PracticesListViewModel(private val practiceDao: PracticeDao) : ViewModel()
         }
     }
 
-    fun newPractices(it: List<PracticeEntity>) {
-        val practices = castToArrayList(it)
-        practices.sortBy { practice ->  practice.name }
-        practiceList.postValue(practices)
-
-    }
-
     fun getSortedNameListByName() {
-        practiceDao.getAll().observeOnce {
+        repo.room.getAll().observeOnce {
             val practices = castToArrayList(it)
-            practices.sortBy { practice ->  practice.name }
+            practices.sortedBy { practice ->  practice.title }
             practiceList.postValue(practices)
         }
     }
 
-    fun findPracticeByName(name: String) {
-        if (name == "") {
-            practiceDao.getAll().observeOnce { practiceList.postValue(castToArrayList(it)) }
-            return
-        }
-
-        practiceDao.getPracticeByName(name).observeOnce { practiceList.postValue(castToArrayList(it)) }
-
-    }
-
-    fun castToArrayList(listPractices: List<PracticeEntity>?): ArrayList<Practice> {
-        val practices = mutableListOf<Practice>() as ArrayList<Practice>
+    fun castToArrayList(listPractices: List<PracticeEntity>?): List<Habit> {
+        val practices = mutableListOf<Habit>()
         listPractices?.map { practiceEntity -> practices.add(practiceEntity.practice) }
         return practices
     }
 
+    fun findPracticeByName(name: String) {
+        if (name == "") {
+            repo.room.getAll().observeOnce{ practiceList.postValue(castToArrayList(it)) }
+            return
+        }
+
+        repo.room.getPracticeByName(name).observeOnce { practiceList.postValue(castToArrayList(it)) }
+    }
+
+
     override fun onCleared() {
         super.onCleared()
-        practiceDao.getAll().removeObserver { observer }
+        repo.practicesStorage.removeObserver { observer }
     }
 
     fun <T> LiveData<T>.observeOnce(observer: Observer<T>) {

@@ -54,8 +54,7 @@ class BottomSheetFragment : BottomSheetDialogFragment() {
         priority_practice.adapter = spinnerAdapter
         priority_practice.onItemSelectedListener = SpinnerContext()
 
-        val db = PracticeDatabase.getInstance(requireContext())
-        practicesListViewModel = ViewModelProvider(this, ViewModelFactory(db!!.practiceDao())).get(PracticesListViewModel::class.java)
+        practicesListViewModel = ViewModelProvider(this, ViewModelFactory(null)).get(PracticesListViewModel::class.java)
         practicesListViewModel.findPracticeByName("")   // hack! чтобы скидывать поиск
 
         findPracticeInput = requireView().findViewById(R.id.find_text_name)

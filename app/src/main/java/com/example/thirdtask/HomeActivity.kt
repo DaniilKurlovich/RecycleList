@@ -6,11 +6,11 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import com.example.thirdtask.Models.Practice
+import com.example.thirdtask.Network.Habit
 import com.google.android.material.navigation.NavigationView
 
 interface PracticeClickListener {
-    fun onPracticeListener(data: Practice)
+    fun onPracticeListener(data: Habit)
 }
 
 

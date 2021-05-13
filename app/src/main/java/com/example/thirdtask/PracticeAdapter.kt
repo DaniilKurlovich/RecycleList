@@ -5,11 +5,13 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.thirdtask.Models.Practice
+import com.example.thirdtask.AddEditPracticeFragment.Companion.PRACTICE_LEVELS
+import com.example.thirdtask.AddEditPracticeFragment.Companion.TYPE_PRACTICE
+import com.example.thirdtask.Network.Habit
 
 
 class PracticeAdapter(
-    var practices: ArrayList<Practice> = ArrayList(),
+    var practices: List<Habit> = listOf(),
     private val practiceClickListener: PracticeClickListener
 ): RecyclerView.Adapter<ViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -38,12 +40,12 @@ class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
     private val type: TextView = itemView.findViewById(R.id.type_practice)
     private val level: TextView = itemView.findViewById(R.id.level_practice)
 
-    fun bind(user: Practice) {
-        namePractice.text = user.name
+    fun bind(user: Habit) {
+        namePractice.text = user.title
         descriptionPractice.text = user.description
-        countRepeat.text = itemView.context.getString(R.string.placeholder_cr, user.count, user.period)
-        type.text = itemView.context.getString(R.string.type_text, user.typePractice)
-        level.text = itemView.context.getString(R.string.level_text, user.priority)
+        countRepeat.text = itemView.context.getString(R.string.placeholder_cr, user.count, user.frequency)
+        type.text = itemView.context.getString(R.string.type_text, TYPE_PRACTICE[user.type])
+        level.text = itemView.context.getString(R.string.level_text, PRACTICE_LEVELS[user.priority])
     }
 
 }
