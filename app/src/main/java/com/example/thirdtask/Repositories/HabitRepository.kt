@@ -1,6 +1,8 @@
 package com.example.thirdtask.Repositories
 
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import com.example.thirdtask.Crud.PracticeDao
 import com.example.thirdtask.Crud.PracticeDatabase
 import com.example.thirdtask.Crud.PracticeEntity
@@ -37,6 +39,15 @@ class HabitRepository(val room: PracticeDao, val api: PracticeService): Coroutin
     private val practices = mutableListOf<Habit>()
 
     suspend fun initPractices() {
+        GlobalScope.launch(Dispatchers.Main) {
+            room.getAll().observeOnce {
+                it.map { h ->
+                    api.addHabit(h.practice)
+                    practices.add(h.practice)
+                }
+            }
+        }
+
         practices.addAll(api.getPractices())
         practicesStorage.postValue(practices)
     }
@@ -63,5 +74,16 @@ class HabitRepository(val room: PracticeDao, val api: PracticeService): Coroutin
         api.addHabit(habit).awaitResponse()
         practices[practices.indexOfFirst { h -> h.uid == habit.uid }] = habit
         practicesStorage.postValue(practices)
+    }
+
+    fun <T> LiveData<T>.observeOnce(observer: Observer<T>) {
+        observeForever(object : Observer<T> {
+
+            override fun onChanged(t: T?) {
+                observer.onChanged(t)
+                removeObserver(this)
+            }
+
+        })
     }
 }
